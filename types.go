@@ -7,6 +7,7 @@ import (
 // Repository is a generic DB handler that cares about default error handling
 type Repository interface {
 	GetAll(target interface{}, preloads ...string) error
+	GetWhere(target interface{}, condition string, preloads ...string) error
 	GetByField(target interface{}, field string, value interface{}, preloads ...string) error
 	GetByFields(target interface{}, filters map[string]interface{}, preloads ...string) error
 

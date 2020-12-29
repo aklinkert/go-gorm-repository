@@ -29,14 +29,30 @@ func (r *gormRepository) DB() *gorm.DB {
 func (r *gormRepository) GetAll(target interface{}, preloads ...string) error {
 	r.logger.Debugf("Executing GetAll on %T", target)
 
-	res := r.DBWithPreloads(preloads).Unscoped().Find(target)
+	res := r.DBWithPreloads(preloads).
+		Unscoped().
+		Find(target)
+
+	return r.HandleError(res)
+}
+
+func (r *gormRepository) GetWhere(target interface{}, condition string, preloads ...string) error {
+	r.logger.Debugf("Executing GetWhere on %T with %v ", target, condition)
+
+	res := r.DBWithPreloads(preloads).
+		Where(condition).
+		Find(target)
+
 	return r.HandleError(res)
 }
 
 func (r *gormRepository) GetByField(target interface{}, field string, value interface{}, preloads ...string) error {
 	r.logger.Debugf("Executing GetByField on %T with %v = %v", target, field, value)
 
-	res := r.DBWithPreloads(preloads).Where(fmt.Sprintf("%v = ?", field), value).Find(target)
+	res := r.DBWithPreloads(preloads).
+		Where(fmt.Sprintf("%v = ?", field), value).
+		Find(target)
+
 	return r.HandleError(res)
 }
 
@@ -55,7 +71,10 @@ func (r *gormRepository) GetByFields(target interface{}, filters map[string]inte
 func (r *gormRepository) GetOneByField(target interface{}, field string, value interface{}, preloads ...string) error {
 	r.logger.Debugf("Executing GetOneByField on %T with %v = %v", target, field, value)
 
-	res := r.DBWithPreloads(preloads).Where(fmt.Sprintf("%v = ?", field), value).First(target)
+	res := r.DBWithPreloads(preloads).
+		Where(fmt.Sprintf("%v = ?", field), value).
+		First(target)
+
 	return r.HandleOneError(res)
 }
 
@@ -74,7 +93,10 @@ func (r *gormRepository) GetOneByFields(target interface{}, filters map[string]i
 func (r *gormRepository) GetOneByID(target interface{}, id string, preloads ...string) error {
 	r.logger.Debugf("Executing GetOneByID on %T with ID %v", target, id)
 
-	res := r.DBWithPreloads(preloads).Where("id = ?", id).First(target)
+	res := r.DBWithPreloads(preloads).
+		Where("id = ?", id).
+		First(target)
+
 	return r.HandleOneError(res)
 }
 
