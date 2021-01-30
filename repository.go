@@ -36,11 +36,35 @@ func (r *gormRepository) GetAll(target interface{}, preloads ...string) error {
 	return r.HandleError(res)
 }
 
+func (r *gormRepository) GetBatch(target interface{}, limit, offset int, preloads ...string) error {
+	r.logger.Debugf("Executing GetBatch on %T", target)
+
+	res := r.DBWithPreloads(preloads).
+		Unscoped().
+		Limit(limit).
+		Offset(offset).
+		Find(target)
+
+	return r.HandleError(res)
+}
+
 func (r *gormRepository) GetWhere(target interface{}, condition string, preloads ...string) error {
 	r.logger.Debugf("Executing GetWhere on %T with %v ", target, condition)
 
 	res := r.DBWithPreloads(preloads).
 		Where(condition).
+		Find(target)
+
+	return r.HandleError(res)
+}
+
+func (r *gormRepository) GetWhereBatch(target interface{}, condition string, limit, offset int, preloads ...string) error {
+	r.logger.Debugf("Executing GetWhere on %T with %v ", target, condition)
+
+	res := r.DBWithPreloads(preloads).
+		Where(condition).
+		Limit(limit).
+		Offset(offset).
 		Find(target)
 
 	return r.HandleError(res)
@@ -65,6 +89,35 @@ func (r *gormRepository) GetByFields(target interface{}, filters map[string]inte
 	}
 
 	res := db.Find(target)
+
+	return r.HandleError(res)
+}
+
+func (r *gormRepository) GetByFieldBatch(target interface{}, field string, value interface{}, limit, offset int, preloads ...string) error {
+	r.logger.Debugf("Executing GetByField on %T with %v = %v", target, field, value)
+
+	res := r.DBWithPreloads(preloads).
+		Where(fmt.Sprintf("%v = ?", field), value).
+		Limit(limit).
+		Offset(offset).
+		Find(target)
+
+	return r.HandleError(res)
+}
+
+func (r *gormRepository) GetByFieldsBatch(target interface{}, filters map[string]interface{}, limit, offset int, preloads ...string) error {
+	r.logger.Debugf("Executing GetByField on %T with filters = %+v", target, filters)
+
+	db := r.DBWithPreloads(preloads)
+	for field, value := range filters {
+		db = db.Where(fmt.Sprintf("%v = ?", field), value)
+	}
+
+	res := db.
+		Limit(limit).
+		Offset(offset).
+		Find(target)
+
 	return r.HandleError(res)
 }
 
