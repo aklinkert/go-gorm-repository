@@ -31,6 +31,32 @@ func main() {
 }
 ```
 
+If you want to extend the repository with your own base or model repository just embed the interface into your implementation like so:
+
+```go
+package base
+
+import "github.com/aklinkert/go-gorm-repository"
+
+type BaseRepository interface {
+	gormrepository.TransactionRepository
+	GetOneByName(target interface{}, name string, preloads ...string) error
+}
+
+type repository struct {
+	gormrepository.TransactionRepository
+}
+
+func NewRepository(db *gorm.DB, logger logging.Logger) BaseRepository {
+	return &repository{
+		TransactionRepository: gormrepository.NewGormRepository(db, logger, "Creator"),
+	}
+}
+
+func (r *repository) GetOneByName(target interface{}, name string, preloads ...string) error {
+	return r.TransactionRepository.GetOneByField(target, "name", name, preloads...)
+}
+```
 
 ## License
 
