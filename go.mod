@@ -4,5 +4,5 @@ go 1.15
 
 require (
 	github.com/aklinkert/go-logging v1.2.0
-	gorm.io/gorm v1.31.1
+	gorm.io/gorm v1.31.2
 )
