@@ -1,7 +1,6 @@
 package gormrepository
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/aklinkert/go-logging"
@@ -199,7 +198,7 @@ func (r *gormRepository) DeleteTx(target interface{}, tx *gorm.DB) error {
 }
 
 func (r *gormRepository) HandleError(res *gorm.DB) error {
-	if res.Error != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
+	if res.Error != nil && res.Error != gorm.ErrRecordNotFound {
 		err := fmt.Errorf("Error: %w", res.Error) //nolint:staticcheck // ST1005: message kept for backward compatibility
 		r.logger.Error(err)
 		return err
