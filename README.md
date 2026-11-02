@@ -11,6 +11,8 @@ entities as well as transactions and common error handling.
 go get github.com/aklinkert/go-gorm-repository
 ```
 
+Requires Go 1.21 or newer.
+
 ## Example
 
 For a complete list of supported methods, please see [types.go](types.go). The logger is a
@@ -50,8 +52,12 @@ func main() {
 The `GetOne*` methods return `gormrepository.ErrNotFound` when no record matches, the list methods return an empty
 result instead.
 
-`GetWhere` conditions and the field names passed to `GetByField(s)` and `GetOneByField(s)` end up in the SQL as they
-are, so never build them from user input. Values are always passed as bound parameters.
+The field names passed to `GetByField`, `GetByFields`, `GetOneByField`, `GetOneByFields` and their batch variants are
+used as given. With default joins, a column that exists in both tables is ambiguous, so qualify it with the table name,
+e.g. `repo.GetByField(&posts, "posts.title", "Hello")`.
+
+`GetWhere` conditions and field names end up in the SQL as they are, so never build them from user input.
+Values are always passed as bound parameters.
 
 If you want to extend the repository with your own base or model repository just embed the interface into your
 implementation like so:

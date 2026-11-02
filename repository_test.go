@@ -263,6 +263,16 @@ func TestDefaultJoins(t *testing.T) {
 	if p.Author == nil || p.Author.Name != "Alice" {
 		t.Errorf("joined author = %+v, want Alice", p.Author)
 	}
+
+	// Field names are used as given, so columns present in both tables need
+	// to be qualified.
+	var posts []post
+	if err := repo.GetByField(&posts, "posts.id", "p2"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := ids(posts); len(got) != 1 || got[0] != "p2" {
+		t.Errorf("got %v, want [p2]", got)
+	}
 }
 
 func TestSaveAndDelete(t *testing.T) {
