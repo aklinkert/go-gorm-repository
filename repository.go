@@ -5,6 +5,7 @@ import (
 
 	"github.com/aklinkert/go-logging"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type gormRepository struct {
@@ -147,7 +148,8 @@ func (r *gormRepository) GetOneByID(target interface{}, id string, preloads ...s
 	r.logger.Debugf("Executing GetOneByID on %T with ID %v", target, id)
 
 	res := r.DBWithPreloads(preloads).
-		Where("id = ?", id).
+		// Qualify the column, an unqualified "id" is ambiguous with default joins.
+		Where(clause.Eq{Column: clause.Column{Table: clause.CurrentTable, Name: "id"}, Value: id}).
 		First(target)
 
 	return r.HandleOneError(res)
@@ -197,7 +199,7 @@ func (r *gormRepository) DeleteTx(target interface{}, tx *gorm.DB) error {
 
 func (r *gormRepository) HandleError(res *gorm.DB) error {
 	if res.Error != nil && res.Error != gorm.ErrRecordNotFound {
-		err := fmt.Errorf("Error: %w", res.Error)
+		err := fmt.Errorf("Error: %w", res.Error) //nolint:staticcheck // ST1005: message kept for backward compatibility
 		r.logger.Error(err)
 		return err
 	}
