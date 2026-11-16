@@ -2,7 +2,7 @@ module github.com/aklinkert/go-gorm-repository
 
 go 1.21
 
-toolchain go1.27.3
+toolchain go1.27.4
 
 require (
 	github.com/aklinkert/go-logging v1.2.0
